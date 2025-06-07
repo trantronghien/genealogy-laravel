@@ -1,5 +1,5 @@
 # Accepted values: 8.3 - 8.2
-ARG PHP_VERSION=8.3
+ARG PHP_VERSION=8.4
 
 ARG COMPOSER_VERSION=latest
 
@@ -105,9 +105,10 @@ COPY  --chown=${USER}:${USER} composer.json composer.lock ./
 RUN composer install \
     --no-dev \
     --no-interaction \
-    --no-autoloader \
     --no-ansi \
     --no-scripts \
+    --optimize-autoloader \
+    --classmap-authoritative \
     --audit
 
 COPY  --chown=${USER}:${USER} . .
@@ -142,5 +143,7 @@ RUN cat .docker/utilities.sh >> ~/.bashrc
 EXPOSE 8000
 
 ENTRYPOINT ["start-container"]
+
+CMD php artisan serve --host=0.0.0.0 --port=8000
 
 HEALTHCHECK --start-period=5s --interval=2s --timeout=5s --retries=8 CMD php artisan octane:status || exit 1
